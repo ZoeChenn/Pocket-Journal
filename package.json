@@ -1,0 +1,33 @@
+{
+  "name": "wehelp-personal-project",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@floating-ui/react": "^0.26.2",
+    "@lexical/list": "^0.12.2",
+    "@lexical/react": "^0.12.2",
+    "@lexical/rich-text": "^0.12.2",
+    "date-fns": "^2.30.0",
+    "firebase": "^10.6.0",
+    "next": "14.0.1",
+    "novel": "^0.1.22",
+    "react": "^18",
+    "react-datepicker": "^4.21.0",
+    "react-dom": "^18",
+    "react-icons": "^4.11.0",
+    "sass": "^1.69.5"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.1",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0"
+  }
+}
