@@ -1,12 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { Editor } from "novel";
+import { format } from 'date-fns';
 import CalendarModal from "../Calendar/CalendarModal"
 import { FiHexagon, FiTrash2, FiCalendar } from 'react-icons/fi';
-import { computePosition, flip, shift, offset, arrow } from "@floating-ui/react";
 
 const Note = ({ index, onDelete, title, content }) => {
   const [ isEditingTitle, setIsEditingTitle ] = useState(false);
   const [ editedTitle, setEditedTitle ] = useState(title);
+  const [ selectedDate, setSelectedDate ] = useState(null);
   const [ isCalendarModalOpen, setIsCalendarModalOpen ] = useState(false);
   const calendarRef = useRef(null);
 
@@ -28,7 +29,6 @@ const Note = ({ index, onDelete, title, content }) => {
 
   const handleOpenCalendarModal = () => {
     setIsCalendarModalOpen(!isCalendarModalOpen);
-    console.log("clicked")
   };
 
   return (
@@ -36,28 +36,33 @@ const Note = ({ index, onDelete, title, content }) => {
       <div className="flex justify-between items-center ">
         <div className="flex items-center">
           <FiHexagon className="w-5 h-5 ml-6 mr-2 text-orange-400  group-hover:fill-current " />
-          {isEditingTitle ? (
+          { isEditingTitle ? (
             <input
               type="text"
               value={ editedTitle }
               onChange={ handleTitleChange }
               onBlur={ handleTitleBlur }
-              className="text-2xl font-light bg-white outline-none group-hover:bg-slate-100 "
+              className="text-2xl font-light bg-white outline-none border-none p-0 m-0 min-w-min group-hover:bg-slate-100"
             />
           ) : (
             <span
-              className="text-2xl font-light cursor-pointer"
-              onClick={handleTitleClick}
+              className="text-2xl font-light min-w-min cursor-pointer"
+              onClick={ handleTitleClick }
             >
-              {editedTitle}
+              { editedTitle }
             </span>
           )}
         </div>
         <div className='flex items-center'>
+        { selectedDate && (
+          <span className='ml-2 text-slate-500 '>
+            {format(selectedDate, 'yyyy-MM-dd')}
+          </span>
+        )}
         <FiCalendar
           id="fi-calendar"
           ref={ calendarRef }
-          className="w-5 h-5 mr-2 cursor-pointer text-gray-400 hover:text-gray-500"
+          className="w-5 h-5 mx-2 cursor-pointer text-gray-400 hover:text-gray-500"
           onClick={ handleOpenCalendarModal }
         />
         <FiTrash2
@@ -67,15 +72,16 @@ const Note = ({ index, onDelete, title, content }) => {
         </div>
       </div>
       <Editor className="my-container min-h-[100px] w-full rounded-lg" defaultValue={content} />
-      {isCalendarModalOpen && (
+      { isCalendarModalOpen && (
         <CalendarModal
-          isOpen={isCalendarModalOpen}
+          isOpen={ isCalendarModalOpen }
           onClose={() => setIsCalendarModalOpen(false)}
-          onSelectDate={(selectedDate) => {
-            console.log(selectedDate);
+          onSelectDate={(date) => {
+            setSelectedDate(date);
             setIsCalendarModalOpen(false);
           }}
-          targetRef={calendarRef}
+          preselectedDate={ selectedDate }
+          targetRef={ calendarRef }
         />
       )}
     </div>

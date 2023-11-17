@@ -3,12 +3,19 @@ import Calendar from "../Calendar/Calendar";
 import { FiX } from 'react-icons/fi';
 import { computePosition, flip, shift, offset, arrow } from "@floating-ui/react";
 
-const CalendarModal = ({ isOpen, onClose, onSelectDate }) => {
-  const [ selectedDate, setSelectedDate ] = useState(null);
+const CalendarModal = ({ isOpen, onClose, onSelectDate, preselectedDate }) => {
+  const [ selectedDate, setSelectedDate ] = useState(preselectedDate);
 
   const handleDateSelect = (date) => {
     setSelectedDate(date);
   };
+
+  const handleDateCancel = () => {
+    setSelectedDate(null);
+    onSelectDate(null);
+    onClose();
+  };
+  
 
   const handleSave = () => {
     if (selectedDate) {
@@ -47,18 +54,21 @@ const CalendarModal = ({ isOpen, onClose, onSelectDate }) => {
         }
       });
     }
-  }, [isOpen]);
-  
+    if (isOpen) {
+      setSelectedDate(preselectedDate || new Date());
+    }
+  }, [ isOpen, preselectedDate ]);
 
   return (
     <div id="calendar-modal"
       className={`${isOpen ? 'block' : 'hidden'} absolute z-9999 max-w-[24rem]`}>
       <div className="relative bg-white p-3 w-full rounded-xl shadow-2xl border-solid border-stone-500">
         <FiX className="absolute w-5 h-5 top-2 right-2 text-gray-500" onClick={ onClose } />
-        <Calendar onDateSelect={ handleDateSelect } />
+        <Calendar onDateSelect={ handleDateSelect } selectedDate={ selectedDate } setSelectedDate={ setSelectedDate } />
         <div id="arrow" className="absolute w-6 h-6 bg-white transform rotate-45" ></div>
-        <div className="flex justify-end">
-          <button className="bg-orange-400 rounded-full text-white px-3 py-2 mt-2" onClick={ handleSave }>Save</button>
+        <div className="flex justify-end space-x-2">
+          <button className="bg-transparent text-gray-500 hover:text-gray-400 px-3 py-2 mt-2" onClick={ handleDateCancel }>Clear</button>
+          <button className="bg-orange-400 hover:bg-orange-300 rounded-full text-white px-3 py-2 mt-2" onClick={ handleSave }>Save</button>
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ import LoginSection from "../layouts/LoginSection";
 export default function HomePage() {
   return (<>
     <Navbar />
-    <main className="h-screen">
+    <main className="h-[72vh]">
       <div className="grid items-center p-10">
         <h2 className="text-3xl sm:text-4xl md:text-5xl mb-5 mt-2 font-bold text-center">Your tasks, notes, and calendar.</h2>
         <h2 className="text-3xl sm:text-4xl md:text-5xl mb-5 mt-2 font-bold text-center">All linked in one place.</h2>
