@@ -6,12 +6,12 @@ export default function HomePage() {
   return (
     <>
       <Navbar />
-      <main className="relative py-52 ">
+      <main className="relative py-52">
         <div className="absolute inset-1 bg-[url('/assets/images/bg-cover.jpg')] bg-center bg-no-repeat opacity-20"></div>
         <div className="relative grid items-center p-3">
           <h2 className="text-3xl sm:text-4xl md:text-5xl mb-5 mt-2 font-bold text-center">Your tasks, notes, and calendar.</h2>
           <h2 className="text-3xl sm:text-4xl md:text-5xl mb-5 mt-2 font-bold text-center">All linked in one place.</h2>
-          <h3 className="text-lg font-light  mt-5 text-center">Let's get started!</h3>
+          <h3 className="text-lg font-light  mt-5 text-center">Lets get started!</h3>
           <div className="flex justify-center mt-10">
             <LoginSection />
           </div>
