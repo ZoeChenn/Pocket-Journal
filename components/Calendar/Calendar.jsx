@@ -107,5 +107,4 @@ const Calendar = ({ onDateSelect, selectedDate, setSelectedDate, defaultDate, no
     </div>
   );
 };
-
 export default Calendar;
