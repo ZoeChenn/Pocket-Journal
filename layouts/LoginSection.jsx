@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router';
-import React, { useState, useEffect } from "react"
+import React, { useEffect } from "react"
 import { UserAuth } from "../lib/AuthContext"
 
 function LoginSection() {
   const { user, googleSignIn, logOut } = UserAuth()
-  const [ loading, setLoading ] = useState(true)
+  // const [ loading, setLoading ] = useState(true)
   const router = useRouter();
 
   const handleSignIn = async () => {
@@ -16,13 +16,13 @@ function LoginSection() {
     }
   }
 
-  const handleSignOut = async () => {
-    try {
-      await logOut()
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  // const handleSignOut = async () => {
+  //   try {
+  //     await logOut()
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
 
   useEffect(() => {
     const checkAuthentication = async () => {

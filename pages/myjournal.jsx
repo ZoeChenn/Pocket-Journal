@@ -1,37 +1,53 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { UserAuth } from "../lib/AuthContext";
 import { FiLogOut, FiPlus, FiPlusCircle, FiFileText, FiX } from 'react-icons/fi';
 import Calendar from "../components/Calendar/Calendar";
+import CalendarTaskList from "../components/Calendar/CalendarTaskList";
 import Note from "../components/Note/Note";
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { getProjectsForUser, getNotesForProject, addProject, addNote, updateProject, updateNote, deleteProject, deleteNote, updateNoteDate } from '../lib/firestore';
 
 export default function MyJournalPage() {
   const { user, logOut } = UserAuth();
   const [ displayName, setDisplayName ] = useState("");
   const [ photoURL, setPhotoURL ] = useState("");
-  const [ notes, setNotes ] = useState([]);
   const [ projects, setProjects ] = useState([]);
+  const [ notes, setNotes ] = useState([]);
   const [ selectedDate, setSelectedDate ] = useState(new Date());
   const [ currentProjectId, setCurrentProjectId ] = useState(null);
   const [ currentProjectTitle, setCurrentProjectTitle ] = useState('Untitled Project');
-  const [ isFirstVisit, setIsFirstVisit ] = useState(true);
+  const [ currentMonth, setCurrentMonth ] = useState(new Date());
   const noteDates = notes.map(note => new Date(note.date));
 
   useEffect(() => {
     if (user) {
       setDisplayName(user.displayName);
       setPhotoURL(user.photoURL);
-      
-      const savedProjects = localStorage.getItem('projects');
-      if (!savedProjects) {
-        setIsFirstVisit(true);
-      } else {
-        setProjects(JSON.parse(savedProjects));
-        setCurrentProjectId(JSON.parse(savedProjects)[0]?.id);
-        setIsFirstVisit(false);
-      }
+
+      getProjectsForUser(user.uid)
+        .then(fetchedProjects => {
+          setProjects(fetchedProjects);
+          if (fetchedProjects.length > 0) {
+            const firstProject = fetchedProjects[0];
+            setCurrentProjectId(firstProject.id);
+            setCurrentProjectTitle(firstProject.title);
+
+            return getNotesForProject(user.uid, firstProject.id);
+          }
+        })
+        .then(fetchedNotes => {
+          if (fetchedNotes) {
+            const sortedNotes = fetchedNotes.sort((a, b) => a.order - b.order);
+            setNotes(sortedNotes);
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching projects or notes:", error);
+        });
     }
   }, [user]);
-
+  
   const handleSignOut = () => {
     try {
       logOut();
@@ -40,183 +56,274 @@ export default function MyJournalPage() {
     }
   };
 
-  const handleAddNote = () => {
-    const newNote = {
-      id: Date.now(),
-      title: "Untitled",
-      projectId: currentProjectId,
-    };
-    setNotes([...notes, newNote]);
-  };
-
-  const handleDeleteNote = (index) => {
-    const updatedNotes = notes.filter((note, i) => i !== index);
-    setNotes(updatedNotes);
-  };
-
-  const handleAddProject = () => {
-    const newProject = {
-      id: Date.now(),
-      title: "Untitled Project",
-      isEditing: false,
-    };
-    const updatedProjects = [...projects, newProject];
-    setProjects(updatedProjects);
-    localStorage.setItem('projects', JSON.stringify(updatedProjects));
-
-    if (localStorage.getItem('firstVisit') === 'true') {
-      setCurrentProjectId(newProject.id);
-      localStorage.removeItem('firstVisit');
+  const handleAddNote = async () => {
+    if (user && currentProjectId) {
+      const newNote = {
+        projectId: currentProjectId,
+        title: "Untitled",
+        content: "",
+        date: null,
+        createdAt: new Date(),
+        order: notes.length
+      };
+      const noteId = await addNote(user.uid, currentProjectId, newNote);
+      setNotes([{ ...newNote, id: noteId }, ...notes ]);
     }
   };
 
-  const handleDeleteProject = (projectId) => {
-    const updatedProjects = projects.filter(project => project.id !== projectId);
-    setProjects(updatedProjects);
-    localStorage.setItem('projects', JSON.stringify(updatedProjects));
-  
-    if (currentProjectId === projectId) {
-      setCurrentProjectId(null);
-      setCurrentProjectTitle('Untitled Project');
+  const handleNoteChange = async (noteId, updatedNote) => {
+    if (!user) return;
+    console.log("Updating note with id:", noteId, "and data:", updatedNote);
+    try {
+      await updateNote(user.uid, currentProjectId, noteId, updatedNote);
+      setNotes(notes.map(note =>
+        note.id === noteId ? { ...note, ...updatedNote } : note
+      ));
+    } catch (error) {
+      console.error("Error updating note:", error);
+    }
+  };
+
+  const handleNoteDateUpdate = async (noteId, newDate) => {
+    setNotes(notes.map(note => {
+      if (note.id === noteId) {
+        return { ...note, date: newDate };
+      }
+      return note;
+    }));
+    try {
+      await updateNoteDate(user.uid, currentProjectId, noteId, newDate);
+    } catch (error) {
+      console.error("Error updating note date:", error);
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    console.log("Deleting note with ID:", noteId);
+    try {
+      await deleteNote(user.uid, currentProjectId, noteId);
+      setNotes(notes.filter(note => note.id !== noteId));
+    } catch (error) {
+      console.error("Error deleting note:", error);
+    }
+  };
+
+  const handleAddProject = async () => {
+    if (user) {
+      const newProject = {
+        userId: user.uid,
+        title: "Untitled Project",
+        createdAt: new Date(),
+        isEditing: false,
+      };
+      const projectId = await addProject(user.uid, newProject);
+      setProjects([...projects, { ...newProject, id: projectId }]);
+    }
+  };
+
+  const handleDeleteProject = async (projectId) => {
+    try {
+      await deleteProject(user.uid, projectId);
+      setProjects(projects.filter(project => project.id !== projectId));
+    } catch (error) {
+      console.error("Error deleting project:", error);
     }
   };
   
-  const handleClickProject = (projectId) => {
-    setCurrentProjectId(projectId);
-  };
-
   const toggleProjectEditing = (id) => {
     setProjects(projects.map(project => 
       project.id === id ? { ...project, isEditing: !project.isEditing } : project
     ));
   };
 
-  const updateProjectTitle = (id, title) => {
-    setProjects(projects.map(project => 
+  const updateProjectTitle = async (id, title) => {
+    try {
+      await updateProject(user.uid, id, { title });
+      setProjects(projects.map(project =>
+        project.id === id ? { ...project, title } : project
+      ));
+    } catch (error) {
+      console.error("Error updating project title:", error);
+    }
+  };
+
+  const handleProjectSelect = async (projectId) => {
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      setCurrentProjectId(projectId);
+      setCurrentProjectTitle(project.title);
+  
+      try {
+        const fetchedNotes = await getNotesForProject(user.uid, projectId);
+        fetchedNotes.sort((a, b) => a.order - b.order);
+        setNotes(fetchedNotes);
+      } catch (error) {
+        console.error("Error fetching notes for project:", error);
+      }
+    }
+  };
+  
+  const handleProjectEdit = (projectId) => {
+    setProjects(projects.map(project =>
+      project.id === projectId ? { ...project, isEditing: true } : project
+    ));
+  };
+  
+  
+  const handleProjectTitleBlur = async (projectId, title) => {
+    if (title.trim() === "") {
+      return;
+    }
+    await updateProjectTitle(projectId, title);
+    toggleProjectEditing(projectId);
+  };
+
+  const handleProjectTitleChange = (id, title) => {
+    setProjects(projects.map(project =>
       project.id === id ? { ...project, title } : project
     ));
   };
 
-  const handleProjectTitleClick = (id) => {
-    const project = projects.find(p => p.id === id);
-    if (project) {
-      setCurrentProjectId(id);
-      setCurrentProjectTitle(project.title);
-      toggleProjectEditing(id);
-    }
+  const handleNoteDateSelect = (noteIndex, date) => {
+    const updatedNotes = notes.map((note, index) => {
+      if (index === noteIndex) {
+        return { ...note, date };
+      }
+      return note;
+    });
+
+    setNotes(updatedNotes);
   };
 
-  const handleProjectTitleChange = (id, title) => {
-    setCurrentProjectTitle(title);
-    updateProjectTitle(id, title);
-  };
+  const moveNote = useCallback((dragIndex, hoverIndex) => {
+    if (!user) return;
+    const newNotes = [...notes];
+    const dragNote = newNotes.splice(dragIndex, 1)[0];
+    newNotes.splice(hoverIndex, 0, dragNote);
+    setNotes(newNotes);
+    newNotes.forEach((note, index) => {
+      updateNote(user.uid, currentProjectId, note.id, { ...note, order: index });
+    });
+  }, [notes, user, currentProjectId]);
 
   return (
-    <main className="flex h-screen bg-white ">
-      <aside className="w-60 p-4 bg-stone-50 hover:bg-stone-100">
-        <div className="flex justify-between">
-        <div className="flex mb-2 items-center">
-          <img
-            src={ photoURL }
-            alt="Profile Pic"
-            className="w-10 h-10 rounded-full mr-2"
-          />
-          <span className="font-bold">{ displayName }, welcome</span>
-        </div>
-        <div className="flex mb-2 items-center cursor-pointer">
-          <FiLogOut onClick={ handleSignOut } />
-        </div>
-        </div>
-        <div className="mt-5">
-          <div className="flex justify-between mb-3 items-center">
-            <p className="text-sm text-gray-600">我的專案</p>
-            <FiPlus className="cursor-pointer" onClick={ handleAddProject } />
+    <DndProvider backend={HTML5Backend}>
+      <main className="flex h-screen bg-white ">
+        <aside className="w-60 p-4 bg-stone-50 hover:bg-stone-100">
+          <div className="flex justify-between">
+          <div className="flex mb-2 items-center">
+            <img
+              src={ photoURL }
+              alt="Profile Pic"
+              className="w-10 h-10 rounded-full mr-2"
+            />
+            <span className="font-bold">{ displayName }, welcome</span>
           </div>
-          <div className="projectWrapper">
-            { projects.map((project) => (
-              <div key={ project.id }
-                className="project flex justify-between items-center mb-2 group"
-              >
-                <div className="flex items-center">
-                  <FiFileText className="w-5 h-5 mr-1 text-orange-400" />
-                  { project.isEditing ? (
-                    <input
-                      type="text"
-                      value={ project.title }
-                      onChange={(e) => handleProjectTitleChange(project.id, e.target.value)}
-                      onBlur={() => toggleProjectEditing(project.id)}
-                      className="w-[160px] outline-dashed outline-orange-400 border-none p-0 m-0 bg-stone-50"
-                    />
-                  ) : (
-                    <p
-                      className="cursor-pointer"
-                      onDoubleClick={() => toggleProjectEditing(project.id)}
-                      onClick={() => handleProjectTitleClick(project.id)}
-                    >
-                      { project.title }
-                    </p>
-                  )}
-                </div>
-                <FiX
-                  className="w-5 h-5 cursor-pointer text-gray-400 hover:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
-                  onClick={() => handleDeleteProject(project.id)}
-                />
-              </div>
-            ))}
+          <div className="flex mb-2 items-center cursor-pointer">
+            <FiLogOut onClick={ handleSignOut } />
           </div>
-        </div>
-      </aside>
-      <section className="projectNoteSection flex-grow p-8 overflow-y-auto">
-        { projects.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <p className="text-2xl font-extralight">Welcome!</p>
-              <p className="text-2xl font-extralight">Click + to create a new project.</p>
+          </div>
+          <div className="mt-5">
+            <div className="flex justify-between mb-3 items-center">
+              <p className="text-sm text-gray-600">我的專案</p>
+              <FiPlus className="cursor-pointer" onClick={ handleAddProject } />
             </div>
-          </div>
-        ) : (
-          <div>
-            <div className="flex justify-between mb-2 items-center">
-              <div className="flex">
-                <p className="text-2xl font-light mr-2">我的專案</p>
-                <p className="text-2xl font-medium">{ currentProjectTitle }</p>
-              </div>
-              <div>
-                { currentProjectId && (
-                  <FiPlusCircle className="w-7 h-7 cursor-pointer text-orange-400 hover:text-orange-300" onClick={ handleAddNote } />
-                )}
-              </div>
-            </div>
-            <div className="noteWrapper">
-              { notes
-                .filter((note) => note.projectId === currentProjectId)
-                .map (( note, index ) => (
-                  <Note
-                    key={ note.id }
-                    index={ index }
-                    onDelete={ handleDeleteNote }
-                    title={ note.title }
-                    content={ note.content }
+            <div className="projectWrapper">
+              { projects.map((project) => (
+                <div key={ project.id }
+                  className="project flex justify-between items-center mb-2 group"
+                >
+                  <div className="flex items-center">
+                    <FiFileText className="w-5 h-5 mr-1 text-orange-400" />
+                    { project.isEditing ? (
+                      <input
+                        type="text"
+                        value={ project.title }
+                        onChange={(e) => handleProjectTitleChange(project.id, e.target.value)}
+                        onBlur={() => handleProjectTitleBlur(project.id, project.title)}
+                        className="w-[160px] outline-dashed outline-orange-400 border-none p-0 m-0 bg-stone-50"
+                      />
+                    ) : (
+                      <p
+                        className="cursor-pointer"
+                        onClick={() => handleProjectSelect(project.id)}
+                        onDoubleClick={() => handleProjectEdit(project.id)}
+                      >
+                        { project.title }
+                      </p>
+                    )}
+                  </div>
+                  <FiX
+                    className="w-5 h-5 cursor-pointer text-gray-400 hover:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
+                    onClick={() => handleDeleteProject(project.id)}
                   />
+                </div>
               ))}
             </div>
           </div>
-        )}
-      </section>
-      <section className="flex flex-col w-1/7 p-4 border-l border-gray">
-        <Calendar
-          selectedDate={ selectedDate }
-          setSelectedDate={ setSelectedDate }
-          defaultDate={ new Date() }
-          noteDates={ noteDates }
-          onDateSelect={(date) => {
-            setSelectedDate(date);
-          }}
-        />
-        <div className="flex-grow overflow-y-auto">
-          <h2 className="text-lg font-bold my-4">Tasks</h2>
-        </div>
-      </section>
-    </main>
+        </aside>
+        <section className="projectNoteSection flex-grow p-8 overflow-y-auto">
+          { projects.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <p className="text-2xl font-extralight">Welcome!</p>
+                <p className="text-2xl font-extralight">Click + to create a new project.</p>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div className="flex justify-between mb-5 items-center">
+                <div className="flex">
+                  <p className="text-2xl font-light mr-2">我的專案</p>
+                  <p className="text-2xl font-medium">{ currentProjectTitle }</p>
+                </div>
+                <div>
+                  { currentProjectId && (
+                    <FiPlusCircle className="w-7 h-7 cursor-pointer text-orange-400 hover:text-orange-300" onClick={ handleAddNote } />
+                  )}
+                </div>
+              </div>
+              <div className="noteWrapper">
+                { notes
+                  .filter((note) => note.projectId === currentProjectId)
+                  .map (( note, index ) => (
+                    <Note
+                      key={ note.id }
+                      index={ index }
+                      note={ note }
+                      date={ note.date }
+                      onUpdate={ handleNoteChange }
+                      onDelete={() => handleDeleteNote(note.id)}
+                      onDateUpdate={ handleNoteDateUpdate }
+                      title={ note.title }
+                      content={ note.content }
+                      onDateSelect={ handleNoteDateSelect }
+                      moveNote={ moveNote }
+                      {...note}
+                    />
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+        <section className="flex flex-col w-1/7 p-4 border-l border-gray">
+          <Calendar
+            notes={ notes }
+            selectedDate={ selectedDate }
+            setSelectedDate={ setSelectedDate }
+            defaultDate={ currentMonth }
+            noteDates={ noteDates }
+            onDateSelect={(date) => {
+              setSelectedDate(date);
+            }}
+            onChangeMonth={ setCurrentMonth }
+          />
+          <hr />
+          <div className="flex-grow overflow-y-auto scrollbar">
+            <CalendarTaskList currentMonth={ currentMonth } />
+          </div>
+        </section>
+      </main>
+    </DndProvider>
   );
 }

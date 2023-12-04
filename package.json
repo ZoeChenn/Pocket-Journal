@@ -15,12 +15,18 @@
     "@lexical/rich-text": "^0.12.2",
     "date-fns": "^2.30.0",
     "firebase": "^10.6.0",
+    "gapi-script": "^1.2.0",
+    "googleapis": "^128.0.0",
+    "lodash": "^4.17.21",
     "next": "14.0.1",
     "novel": "^0.1.22",
     "react": "^18",
     "react-datepicker": "^4.21.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18",
     "react-icons": "^4.11.0",
+    "react-spinners": "^0.13.8",
     "sass": "^1.69.5"
   },
   "devDependencies": {

@@ -16,7 +16,6 @@ const CalendarModal = ({ isOpen, onClose, onSelectDate, preselectedDate }) => {
     onClose();
   };
   
-
   const handleSave = () => {
     if (selectedDate) {
       onSelectDate(selectedDate);
@@ -61,9 +60,9 @@ const CalendarModal = ({ isOpen, onClose, onSelectDate, preselectedDate }) => {
 
   return (
     <div id="calendar-modal"
-      className={`${isOpen ? 'block' : 'hidden'} absolute z-9999 max-w-[24rem]`}>
+      className={`${isOpen ? 'block' : 'hidden'} absolute z-50 max-w-[24rem]`}>
       <div className="relative bg-white p-3 w-full rounded-xl shadow-2xl border-solid border-stone-500">
-        <FiX className="absolute w-5 h-5 top-2 right-2 text-gray-500" onClick={ onClose } />
+        <FiX className="absolute w-5 h-5 top-2 right-2 text-gray-500 cursor-pointer" onClick={ onClose } />
         <Calendar onDateSelect={ handleDateSelect } selectedDate={ selectedDate } setSelectedDate={ setSelectedDate } />
         <div id="arrow" className="absolute w-6 h-6 bg-white transform rotate-45" ></div>
         <div className="flex justify-end space-x-2">

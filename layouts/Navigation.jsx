@@ -8,7 +8,7 @@ export const Navigation = () => {
   const { user, logOut } = UserAuth();
   const [ displayName, setDisplayName ] = useState("");
   const [ photoURL, setPhotoURL ] = useState("");
-  const [ loading, setLoading ] = useState(true);
+  // const [ loading, setLoading ] = useState(true);
 
   const handleSignOut = () => {
     try {
@@ -23,7 +23,6 @@ export const Navigation = () => {
     if (user) {
       setDisplayName(user.displayName);
       setPhotoURL(user.photoURL);
-      console.log(user)
     }
   }, [user]);
 

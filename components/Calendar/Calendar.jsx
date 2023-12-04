@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { format, startOfWeek, addDays, startOfMonth, endOfMonth, endOfWeek, isSameMonth, isSameDay, addMonths, subMonths, addWeeks } from 'date-fns';
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 
-const Calendar = ({ onDateSelect, selectedDate, setSelectedDate, defaultDate, noteDates }) => {
+const Calendar = ({ onChangeMonth, onDateSelect, selectedDate, setSelectedDate, defaultDate, notes = [] }) => {
   const [ currentMonth, setCurrentMonth ] = useState(defaultDate || new Date() );
 
   const renderHeader = () => {
@@ -54,21 +54,24 @@ const Calendar = ({ onDateSelect, selectedDate, setSelectedDate, defaultDate, no
         formattedDate = format(day, dateFormat);
         const cloneDay = day;
         const isSelected = isSameDay(cloneDay, selectedDate);
-        const hasNote = noteDates && noteDates.some(noteDate => isSameDay(cloneDay, noteDate));
+        const hasNote = notes?.some(note => note.date && isSameDay(cloneDay, new Date(note.date)));
         days.push(
           <div
-            className={`col-span-1 text-center p-1 rounded-full cursor-pointer ${!isSameMonth(cloneDay, currentMonth)
-              ? "text-gray-400"
-              : isSelected
-              ? "bg-orange-400 text-white"
-              : "text-gray-700"
+            className={`col-span-1 text-center p-1 rounded-full cursor-pointer relative ${
+              !isSameMonth(cloneDay, currentMonth)
+                ? "text-gray-400"
+                : isSelected
+                ? "bg-orange-400 text-white"
+                : "text-gray-700"
             }`}
             key={ cloneDay }
             onClick={() => onDateClick(cloneDay)}
           >
-            <span className="inline-block w-7 h-7 leading-7 text-center rounded-full hover:bg-orange-200">
+            <span className={`w-9 h-9 text-center rounded-full hover:bg-orange-200 flex items-center justify-center ${
+              isSelected ? "bg-orange-400 text-white" : ""
+            }`}>
               { formattedDate }
-              { hasNote && <span className="block w-1 h-1 bg-orange-400 rounded-full mx-auto mt-1"></span> }
+              { hasNote && <span className="absolute w-1 h-1 bg-orange-600 rounded-full bottom-0 mb-2 left-1/2 transform -translate-x-1/2"></span> }
             </span>
           </div>
         );
@@ -92,15 +95,23 @@ const Calendar = ({ onDateSelect, selectedDate, setSelectedDate, defaultDate, no
   };
 
   const nextMonth = () => {
-    setCurrentMonth(addMonths(currentMonth, 1));
+    const next = addMonths(currentMonth, 1);
+    setCurrentMonth(next);
+    if (onChangeMonth) {
+      onChangeMonth(next);
+    }
   };
 
   const prevMonth = () => {
-    setCurrentMonth(subMonths(currentMonth, 1));
+    const prev = subMonths(currentMonth, 1);
+    setCurrentMonth(prev);
+    if (onChangeMonth) {
+      onChangeMonth(prev);
+    }
   };
 
   return (
-    <div className=" bg-white overflow-hidden">
+    <div className=" bg-white overflow-visible">
       { renderHeader() }
       { renderDays() }
       { renderCells() }

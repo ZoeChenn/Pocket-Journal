@@ -5,3 +5,36 @@
 .my-container .ProseMirror {
   padding: 1rem 2rem 1rem 2rem;
 }
+
+.scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background-color: #eab267;
+  border-radius: 10px;
+  margin: 200px 30px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #e88b11;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.drag-handle {
+  display: none;
+}
+
+.novel-prose-lg p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
