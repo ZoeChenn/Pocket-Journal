@@ -1,4 +1,5 @@
 import React from "react";
+import Head from 'next/head';
 import Navbar from "../layouts/Navbar";
 import LoginSection from "../layouts/LoginSection";
 import { FiChevronsDown, FiChevronsUp } from "react-icons/fi";
@@ -14,6 +15,9 @@ export default function HomePage() {
 
   return (
     <>
+      <Head>
+        <title>Pocket Journal</title>
+      </Head>
       <Navbar />
       <section className="relative py-52">
         <div className="absolute inset-1 bg-[url('/assets/images/bg-cover.jpg')] bg-center bg-no-repeat opacity-20"></div>
