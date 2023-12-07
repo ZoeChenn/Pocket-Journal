@@ -38,3 +38,57 @@
   margin-top: 0;
   margin-bottom: 0;
 }
+
+#slash-command button:nth-child(1),
+#slash-command button:nth-child(2),
+#slash-command button:last-child {
+  display: none;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  content: "Empty note";
+  color: #adb5bd;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror p.is-empty::before {
+  content: "Write something...";
+  color: #adb5bd;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.novel-flex.novel-items-start.novel-my-4
+input[type=checkbox] {
+  width: 1em;
+  height: 1em;
+}
+
+.novel-not-prose.novel-pl-2.novel-my-4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.tiptap.ProseMirror.novel-prose-lg.prose-headings\:novel-font-title.novel-font-default >
+h1 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  margin-bottom: 0.6666667em;
+}
+
+.tiptap.ProseMirror.novel-prose-lg.prose-headings\:novel-font-title.novel-font-default >
+h2 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  margin-bottom: 0.6666667em;
+}
+
+.tiptap.ProseMirror.novel-prose-lg.prose-headings\:novel-font-title.novel-font-default >
+h3 {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  margin-bottom: 0.6666667em;
+}

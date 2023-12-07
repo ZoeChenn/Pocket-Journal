@@ -37,19 +37,7 @@ const CalendarTaskList = ({ currentMonth }) => {
       if (!auth2.isSignedIn.get()) {
         auth2.signIn();
       }
-
-      // 強制重新授權
-      // const auth2 = gapi.auth2.getAuthInstance();
-      // if (auth2.isSignedIn.get()) {
-      //   await auth2.signOut();
-      // }
-      // auth2.signIn({ prompt: 'consent' }).then(() => {
-      // }).catch(error => {
-      //   console.error('Error during sign in:', error);
-      // });
-      
-
-      // 個人日曆
+ 
       const userCalendarResponse = await gapi.client.calendar.events.list({
         calendarId: 'primary',
         timeMin: startOfMonth,
@@ -60,7 +48,6 @@ const CalendarTaskList = ({ currentMonth }) => {
         orderBy: 'startTime',
       });
 
-      // 台灣節慶假日日曆
       const taiwanHolidaysCalendarId = 'zh-tw.taiwan#holiday@group.v.calendar.google.com';
       const taiwanHolidaysResponse = await gapi.client.calendar.events.list({
         calendarId: taiwanHolidaysCalendarId,
@@ -74,8 +61,6 @@ const CalendarTaskList = ({ currentMonth }) => {
       });
 
       const combinedEvents = userCalendarResponse.result.items.concat(taiwanHolidaysResponse.result.items);
-      console.log(combinedEvents)
-      console.log(userCalendarResponse.result.items.length)
       setEvents(combinedEvents);
       setIsLoading(false);
     };
@@ -95,8 +80,6 @@ const CalendarTaskList = ({ currentMonth }) => {
     if (isAllDay) return '整天';
     return `${format(parseISO(startDateStr), 'HH:mm', { locale: zhTW })} - ${format(parseISO(endDateStr), 'HH:mm', { locale: zhTW })}`;
   };
-
-  
 
   const groupEventsByDate = (events) => {
     return events.reduce((acc, event) => {

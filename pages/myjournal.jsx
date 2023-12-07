@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { UserAuth } from "../lib/AuthContext";
-import { FiLogOut, FiPlus, FiPlusCircle, FiFileText, FiX } from 'react-icons/fi';
+import { FiLogOut, FiPlus, FiPlusCircle, FiFileText, FiX, FiChevronRight, FiChevronLeft } from 'react-icons/fi';
 import Calendar from "../components/Calendar/Calendar";
 import CalendarTaskList from "../components/Calendar/CalendarTaskList";
 import Note from "../components/Note/Note";
@@ -19,6 +19,9 @@ export default function MyJournalPage() {
   const [ currentProjectTitle, setCurrentProjectTitle ] = useState('Untitled Project');
   const [ currentMonth, setCurrentMonth ] = useState(new Date());
   const noteDates = notes.map(note => new Date(note.date));
+  const [ activeNoteId, setActiveNoteId ] = useState(null);
+  const [ isSidebarOpen, setIsSidebarOpen ] = useState(false);
+  const [ isCalendarBarOpen, setIsCalendarBarOpen ] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -56,6 +59,14 @@ export default function MyJournalPage() {
     }
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const toggleCalendarBar = () => {
+    setIsCalendarBarOpen(!isCalendarBarOpen);
+  };
+
   const handleAddNote = async () => {
     if (user && currentProjectId) {
       const newNote = {
@@ -73,7 +84,6 @@ export default function MyJournalPage() {
 
   const handleNoteChange = async (noteId, updatedNote) => {
     if (!user) return;
-    console.log("Updating note with id:", noteId, "and data:", updatedNote);
     try {
       await updateNote(user.uid, currentProjectId, noteId, updatedNote);
       setNotes(notes.map(note =>
@@ -99,7 +109,6 @@ export default function MyJournalPage() {
   };
 
   const handleDeleteNote = async (noteId) => {
-    console.log("Deleting note with ID:", noteId);
     try {
       await deleteNote(user.uid, currentProjectId, noteId);
       setNotes(notes.filter(note => note.id !== noteId));
@@ -124,7 +133,30 @@ export default function MyJournalPage() {
   const handleDeleteProject = async (projectId) => {
     try {
       await deleteProject(user.uid, projectId);
-      setProjects(projects.filter(project => project.id !== projectId));
+      const updatedProjects = projects.filter(project => project.id !== projectId);
+      setProjects(updatedProjects);
+  
+      if (projectId === currentProjectId) {
+        const projectIndex = projects.findIndex(project => project.id === projectId);
+        let newSelectedProject;
+
+        if (projectIndex > 0) {
+          newSelectedProject = updatedProjects[projectIndex - 1];
+        } else if (updatedProjects.length > 0) {
+          newSelectedProject = updatedProjects[0];
+        }
+  
+        if (newSelectedProject) {
+          setCurrentProjectId(newSelectedProject.id);
+          setCurrentProjectTitle(newSelectedProject.title);
+          const newNotes = await getNotesForProject(user.uid, newSelectedProject.id);
+          setNotes(newNotes);
+        } else {
+          setCurrentProjectId(null);
+          setCurrentProjectTitle('Untitled Project');
+          setNotes([]);
+        }
+      }
     } catch (error) {
       console.error("Error deleting project:", error);
     }
@@ -182,6 +214,9 @@ export default function MyJournalPage() {
     setProjects(projects.map(project =>
       project.id === id ? { ...project, title } : project
     ));
+    if (id === currentProjectId) {
+      setCurrentProjectTitle(title);
+    }
   };
 
   const handleNoteDateSelect = (noteIndex, date) => {
@@ -206,10 +241,14 @@ export default function MyJournalPage() {
     });
   }, [notes, user, currentProjectId]);
 
+  const handleNoteClick = (noteId) => {
+    setActiveNoteId(noteId);
+  };
+  
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProvider backend={ HTML5Backend }>
       <main className="flex h-screen bg-white ">
-        <aside className="w-60 p-4 bg-stone-50 hover:bg-stone-100">
+        <aside className={`w-60 p-4 bg-stone-50 hover:bg-stone-100 ${isSidebarOpen ? '' : 'hidden lg:block'}`}>
           <div className="flex justify-between">
           <div className="flex mb-2 items-center">
             <img
@@ -225,7 +264,7 @@ export default function MyJournalPage() {
           </div>
           <div className="mt-5">
             <div className="flex justify-between mb-3 items-center">
-              <p className="text-sm text-gray-600">我的專案</p>
+              <p className="text-sm text-gray-600">專案列表</p>
               <FiPlus className="cursor-pointer" onClick={ handleAddProject } />
             </div>
             <div className="projectWrapper">
@@ -241,7 +280,7 @@ export default function MyJournalPage() {
                         value={ project.title }
                         onChange={(e) => handleProjectTitleChange(project.id, e.target.value)}
                         onBlur={() => handleProjectTitleBlur(project.id, project.title)}
-                        className="w-[160px] outline-dashed outline-orange-400 border-none p-0 m-0 bg-stone-50"
+                        className="w-[160px] outline-orange-400 p-0 m-0 bg-stone-50"
                       />
                     ) : (
                       <p
@@ -253,7 +292,7 @@ export default function MyJournalPage() {
                       </p>
                     )}
                   </div>
-                  <FiX
+                  < FiX
                     className="w-5 h-5 cursor-pointer text-gray-400 hover:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
                     onClick={() => handleDeleteProject(project.id)}
                   />
@@ -262,7 +301,12 @@ export default function MyJournalPage() {
             </div>
           </div>
         </aside>
-        <section className="projectNoteSection flex-grow p-8 overflow-y-auto">
+        { isSidebarOpen ? (
+          <FiChevronLeft onClick={ toggleSidebar } className="lg:hidden my-auto cursor-pointer w-5 h-5 text-gray-500" />
+        ) : (
+          <FiChevronRight onClick={ toggleSidebar } className="lg:hidden my-auto cursor-pointer w-5 h-5 text-gray-500" />
+        )}
+        <section className="projectNoteSection flex-grow px-8 py-8 overflow-y-auto scrollbar max-md:px-4">
           { projects.length === 0 ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -274,8 +318,13 @@ export default function MyJournalPage() {
             <div>
               <div className="flex justify-between mb-5 items-center">
                 <div className="flex">
-                  <p className="text-2xl font-light mr-2">我的專案</p>
-                  <p className="text-2xl font-medium">{ currentProjectTitle }</p>
+                  <input
+                    type="text"
+                    value={ currentProjectTitle }
+                    onChange={(e) => handleProjectTitleChange(currentProjectId, e.target.value)}
+                    onBlur={() => updateProjectTitle(currentProjectId, currentProjectTitle)}
+                    className="text-3xl font-medium outline-orange-400"
+                  />
                 </div>
                 <div>
                   { currentProjectId && (
@@ -287,7 +336,7 @@ export default function MyJournalPage() {
                 { notes
                   .filter((note) => note.projectId === currentProjectId)
                   .map (( note, index ) => (
-                    <Note
+                    < Note
                       key={ note.id }
                       index={ index }
                       note={ note }
@@ -299,6 +348,8 @@ export default function MyJournalPage() {
                       content={ note.content }
                       onDateSelect={ handleNoteDateSelect }
                       moveNote={ moveNote }
+                      onClick={() => handleNoteClick(note.id)}
+                      isActive={ activeNoteId === note.id }
                       {...note}
                     />
                 ))}
@@ -306,8 +357,8 @@ export default function MyJournalPage() {
             </div>
           )}
         </section>
-        <section className="flex flex-col w-1/7 p-4 border-l border-gray">
-          <Calendar
+        <section className={`flex flex-col w-1/7 p-4 border-l border-gray max-md:w-5/12 ${isCalendarBarOpen ? '' : 'hidden md:block'}`}>
+          < Calendar
             notes={ notes }
             selectedDate={ selectedDate }
             setSelectedDate={ setSelectedDate }
@@ -323,6 +374,11 @@ export default function MyJournalPage() {
             <CalendarTaskList currentMonth={ currentMonth } />
           </div>
         </section>
+        { isCalendarBarOpen ? (
+          <FiChevronRight onClick={ toggleCalendarBar } className="md:hidden my-auto cursor-pointer w-5 h-5 text-gray-500" />
+        ) : (
+          <FiChevronLeft onClick={ toggleCalendarBar } className="md:hidden my-auto cursor-pointer w-5 h-5 text-gray-500" />
+        )}
       </main>
     </DndProvider>
   );

@@ -5,7 +5,7 @@ import CalendarModal from "../Calendar/CalendarModal"
 import { FiTrash2, FiCalendar, FiCircle } from 'react-icons/fi';
 import { useDrag, useDrop } from 'react-dnd';
 
-const Note = ({ index, note, title, content, moveNote, onDateSelect, onDelete, onUpdate, onDateUpdate  }) => {
+const Note = ({ index, note, title, content, moveNote, onDateSelect, onDelete, onUpdate, onDateUpdate, onClick, isActive }) => {
   const noteContent = note ? note.content : '';
   const calendarRef = useRef(null);
   const ref = useRef(null);
@@ -50,7 +50,7 @@ const Note = ({ index, note, title, content, moveNote, onDateSelect, onDelete, o
     onDateUpdate(note.id, date);
   };
 
-  const [{ isDragging }, drag] = useDrag({
+  const [{ isDragging }, drag, preview] = useDrag({
     type: 'note',
     item: { type: 'note', index },
     collect: monitor => ({
@@ -80,18 +80,19 @@ const Note = ({ index, note, title, content, moveNote, onDateSelect, onDelete, o
     },
   });
 
-  drag(drop(ref));
+  drag(grabRef);
+  drop(ref)
 
   return (
     <div
-      ref={ ref } style={{ opacity: isDragging ? 0 : 1 }}
-      className="group py-2 rounded-lg border-2 border-transparent hover:border-2 hover:border-orange-200 hover:bg-orange-50"
+      ref={ ref } style={{ opacity: isDragging ? 0 : 1 }} onClick={ onClick } 
+      className={`group py-2 mb-2 rounded-lg border-2 border-transparent transition duration-300 ease-in-out hover:border-2 hover:border-orange-200 hover:bg-orange-50 ${isActive ? 'border-2 border-orange-200 bg-orange-50' : ''}`}
     >
-      <div ref={ grabRef } className='cursor-grab group-hover:border-t-2 group-hover:border-orange-200 group-hover:w-5 group-hover:m-auto'></div>
-      <div className="flex justify-between items-center ">
+      <div ref={ grabRef } className={`cursor-grab border-t-4 border-transparent w-5 m-auto transition duration-300 ease-in-out group-hover:border-t-4 group-hover:border-orange-200 ${isActive ? 'border-t-4 border-orange-200' : ''}`}></div>
+      <div className="flex justify-between items-center" ref={ preview }>
         <div className="flex items-center">
           <FiCircle 
-            className="ml-6 mr-1 text-orange-400 fill-current group-hover:border group-hover:border-orange-400 rounded-full p-1 transition duration-300 ease-in-out"
+            className={`ml-6 mr-1 text-orange-400 fill-current border-transparent rounded-full p-1 transition duration-300 ease-in-out group-hover:border group-hover:border-orange-400 ${isActive ? 'border border-orange-400' : ''}`}
             size={ 22 }
           />
           { isEditingTitle ? (
@@ -100,7 +101,7 @@ const Note = ({ index, note, title, content, moveNote, onDateSelect, onDelete, o
               value={ editedTitle }
               onChange={ handleTitleChange }
               onBlur={ handleTitleBlur }
-              className="text-2xl font-light bg-white outline-none border-none p-0 m-0 min-w-min group-hover:bg-slate-100"
+              className="text-2xl font-light outline-none border-none p-0 m-0 min-w-min group-hover:bg-slate-100"
             />
           ) : (
             <span
@@ -117,12 +118,12 @@ const Note = ({ index, note, title, content, moveNote, onDateSelect, onDelete, o
               {format(note.date || selectedDate, 'yyyy-MM-dd')}
             </span>
           )}
-          <FiCalendar
-            id="fi-calendar"
-            ref={ calendarRef }
-            className="w-5 h-5 mx-2 cursor-pointer text-gray-400 hover:text-gray-500"
-            onClick={ handleOpenCalendarModal }
-          />
+          <span ref={ calendarRef }>
+            <FiCalendar
+              className="w-5 h-5 mx-2 cursor-pointer text-gray-400 hover:text-gray-500"
+              onClick={ handleOpenCalendarModal }
+            />
+          </span>
           <FiTrash2
             className="w-5 h-5 mr-10 cursor-pointer text-gray-400 hover:text-gray-500"
             onClick={() => handleDelete(index)}
@@ -130,7 +131,7 @@ const Note = ({ index, note, title, content, moveNote, onDateSelect, onDelete, o
         </div>
       </div>
       <Editor
-        className="my-container min-h-[100px] w-full rounded-lg" 
+        className="my-container min-h-[80px] w-full rounded-lg" 
         defaultValue={ content }
         disableLocalStorage={ true }
         value={ editContent }

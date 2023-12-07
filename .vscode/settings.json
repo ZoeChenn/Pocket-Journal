@@ -5,6 +5,8 @@
     "firebaseapp",
     "firestore",
     "gapi",
-    "myjournal"
+    "Keymap",
+    "myjournal",
+    "tiptap"
   ]
 }
