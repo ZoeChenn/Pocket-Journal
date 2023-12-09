@@ -6,6 +6,13 @@ import { FiChevronsDown, FiChevronsUp } from "react-icons/fi";
 
 export default function HomePage() {
 
+  const scrollDown = () => {
+    window.scrollTo({
+      top: 740,
+      behavior: 'smooth'
+    });
+  };
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -19,22 +26,22 @@ export default function HomePage() {
         <title>Pocket Journal</title>
       </Head>
       <Navbar />
-      <section className="relative py-52">
+      <section className="relative py-40 max-xl:py-36">
         <div className="absolute inset-1 bg-[url('/assets/images/bg-cover.jpg')] bg-center bg-no-repeat opacity-20"></div>
-        <div className="relative grid items-center p-3">
+        <div className="relative grid items-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl mb-5 mt-2 font-bold text-center" data-aos="fade-in">Your tasks, notes, and calendar.</h2>
           <h2 className="text-3xl sm:text-4xl md:text-5xl mb-5 mt-2 font-bold text-center" data-aos="fade-in">All linked in one place.</h2>
-          <h3 className="text-lg font-normal  mt-5 text-center" data-aos="fade-up">Lets get started!</h3>
+          <h3 className="text-lg font-normal mt-5 text-center" data-aos="fade-up">Lets get started!</h3>
           <div className="flex justify-center mt-10" data-aos="fade-up">
             <LoginSection />
           </div>
         </div>
-      </section>
-        <div class="text-center mt-5" data-aos="fade-up">
+        <div className="text-center mt-20 cursor-pointer" data-aos="fade-up" onClick={ scrollDown }>
           <span className="font-semibold text-xl"> SCROLL DOWN </span>
           <br />
           <FiChevronsDown className="mx-auto w-9 h-9 mt-5 animate-bounce" />
         </div>
+      </section>
         <div className="mx-auto py-24 px-24 bg-white">
           <div className="mx-auto flex flex-wrap md:flex-row-reverse">
             <div className="w-full md:w-2/6  md:pl-12" data-aos="fade-left">
@@ -77,10 +84,10 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-        <div class="text-center mt-5" data-aos="fade-up">
+        <div class="text-center mt-5 cursor-pointer" data-aos="fade-up" onClick={ scrollToTop }>
           <span className="font-semibold text-xl"> BACK TO TOP </span>
           <br />
-          <FiChevronsUp className="mx-auto w-9 h-9 mt-5 animate-bounce cursor-pointer" onClick={ scrollToTop } />
+          <FiChevronsUp className="mx-auto w-9 h-9 mt-5 animate-bounce" />
         </div>
       <footer className="mt-20 w-full border-t border-solid border-stone-100">
         <div className="px-4 lg:px-40 py-4 flex justify-between items-center">

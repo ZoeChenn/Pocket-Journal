@@ -12,7 +12,7 @@ const Calendar = ({ onChangeMonth, onDateSelect, selectedDate, setSelectedDate, 
         <button onClick={ prevMonth } className="p-2">
           <FaAngleLeft className="text-gray-500 hover:text-gray-700"/>
         </button>
-        <span className="text-lg font-bold text-gray-800">
+        <span className="text-lg font-bold text-gray-800 cursor-default">
           { format(currentMonth, dateFormat) }
         </span>
         <button onClick={ nextMonth } className="p-2">
@@ -28,7 +28,7 @@ const Calendar = ({ onChangeMonth, onDateSelect, selectedDate, setSelectedDate, 
     let startDate = startOfWeek( currentMonth, { weekStartsOn: 1 } );
     for (let i = 0; i < 7; i++) {
       days.push(
-        <div className="col-span-1 text-center font-medium text-xs text-gray-500 uppercase" key={i}>
+        <div className="col-span-1 text-center font-medium text-xs text-gray-500 uppercase cursor-default" key={i}>
           { format(addDays(startDate, i), dateFormat) }
         </div>
       );

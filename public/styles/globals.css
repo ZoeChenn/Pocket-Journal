@@ -7,18 +7,18 @@
 }
 
 .scrollbar::-webkit-scrollbar {
-  width: 5px;
+  width: 3px;
 }
 
 .scrollbar::-webkit-scrollbar-track {
-  background-color: #eab267;
+  background-color: #eecea4;
   border-radius: 10px;
-  margin: 200px 30px;
+  margin: 200px 40px;
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #e88b11;
+  background-color: #ef951e;
 }
 
 .no-scrollbar::-webkit-scrollbar {

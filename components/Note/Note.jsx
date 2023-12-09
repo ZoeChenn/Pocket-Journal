@@ -114,7 +114,7 @@ const Note = ({ index, note, title, content, moveNote, onDateSelect, onDelete, o
         </div>
         <div className='flex items-center'>
           {(note.date || selectedDate) && (
-            <span className='ml-2 text-slate-500'>
+            <span className='ml-2 text-slate-500 cursor-default'>
               {format(note.date || selectedDate, 'yyyy-MM-dd')}
             </span>
           )}

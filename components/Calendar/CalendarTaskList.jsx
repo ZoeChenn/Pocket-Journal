@@ -37,7 +37,7 @@ const CalendarTaskList = ({ currentMonth }) => {
       if (!auth2.isSignedIn.get()) {
         auth2.signIn();
       }
- 
+
       const userCalendarResponse = await gapi.client.calendar.events.list({
         calendarId: 'primary',
         timeMin: startOfMonth,
@@ -97,11 +97,11 @@ const CalendarTaskList = ({ currentMonth }) => {
     return Object.entries(groupedEvents).map(([date, events]) => {
       const formattedDate = formatDate(events[0].start.dateTime || events[0].start.date);
       return (
-        <div key={date} className="event-group mb-8">
-          <div className="event-date mb-2 font-bold">{formattedDate}</div>
-          {events.map((event, index) => (
-            <div key={index} className="event-item">
-              <span className="event-time font-light pr-2">{formatTime(event.start.dateTime, event.end.dateTime, event.start.date && !event.start.dateTime)}</span>
+        <div key={ date } className="event-group mb-8 cursor-default">
+          <div className="event-date mb-2 font-bold">{ formattedDate }</div>
+          { events.map((event, index) => (
+            <div key={ index } className="event-item">
+              <span className="event-time font-light pr-2">{ formatTime(event.start.dateTime, event.end.dateTime, event.start.date && !event.start.dateTime) }</span>
               <span className="event-summary font-light border-l-2 border-orange-400 pl-2">{event.summary}</span>
             </div>
           ))}
@@ -115,7 +115,7 @@ const CalendarTaskList = ({ currentMonth }) => {
       { isLoading ? (<HashLoader
         color="#d67e36"
         loading
-        size={28}
+        size={ 28 }
         className='m-auto'
       />
       ): (

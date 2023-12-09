@@ -201,7 +201,6 @@ export default function MyJournalPage() {
     ));
   };
   
-  
   const handleProjectTitleBlur = async (projectId, title) => {
     if (title.trim() === "") {
       return;
@@ -247,10 +246,10 @@ export default function MyJournalPage() {
   
   return (
     <DndProvider backend={ HTML5Backend }>
-      <main className="flex h-screen bg-white ">
+      <main className="flex h-screen bg-white overflow-hidden">
         <aside className={`w-60 p-4 bg-stone-50 hover:bg-stone-100 ${isSidebarOpen ? '' : 'hidden lg:block'}`}>
           <div className="flex justify-between">
-          <div className="flex mb-2 items-center">
+          <div className="flex mb-2 items-center cursor-default">
             <img
               src={ photoURL }
               alt="Profile Pic"
@@ -264,7 +263,7 @@ export default function MyJournalPage() {
           </div>
           <div className="mt-5">
             <div className="flex justify-between mb-3 items-center">
-              <p className="text-sm text-gray-600">專案列表</p>
+              <p className="text-sm text-gray-600 cursor-default">專案列表</p>
               <FiPlus className="cursor-pointer" onClick={ handleAddProject } />
             </div>
             <div className="projectWrapper">
@@ -317,7 +316,7 @@ export default function MyJournalPage() {
           ) : (
             <div>
               <div className="flex justify-between mb-5 items-center">
-                <div className="flex">
+                <div className="flex cursor-pointer">
                   <input
                     type="text"
                     value={ currentProjectTitle }
@@ -357,7 +356,7 @@ export default function MyJournalPage() {
             </div>
           )}
         </section>
-        <section className={`flex flex-col w-1/7 p-4 border-l border-gray max-md:w-5/12 ${isCalendarBarOpen ? '' : 'hidden md:block'}`}>
+        <section className={`flex w-1/7 p-4 border-l border-gray max-md:w-5/12 ${isCalendarBarOpen ? '' : 'hidden md:block'}`}>
           < Calendar
             notes={ notes }
             selectedDate={ selectedDate }
@@ -370,7 +369,7 @@ export default function MyJournalPage() {
             onChangeMonth={ setCurrentMonth }
           />
           <hr />
-          <div className="flex-grow overflow-y-auto scrollbar">
+          <div className="max-h-[600px] overflow-y-auto scrollbar">
             <CalendarTaskList currentMonth={ currentMonth } />
           </div>
         </section>
