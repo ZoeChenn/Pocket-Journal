@@ -119,7 +119,7 @@ const CalendarTaskList = ({ currentMonth }) => {
         className='m-auto'
       />
       ): (
-        events.length > 0 ? renderEvents() : <p>No events.</p> 
+        events.length > 0 ? renderEvents() : <p className='cursor-default'>No events.</p> 
       )}
     </div>
   );

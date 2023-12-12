@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import { UserAuth } from "../lib/AuthContext"
 
-function LoginSection() {
+function LoginBtn() {
   const { user, googleSignIn } = UserAuth()
 
   const handleSignIn = async () => {
@@ -25,10 +25,10 @@ function LoginSection() {
         <img className="w-6 h-6 mr-2" src="/assets/images/icons/google-icon.svg" alt="" />
         <button className="font-light" onClick={ handleSignIn }>
         login with google
-      </button>
+        </button>
       </div>
     </div>
   );
 }
 
-export default LoginSection;
+export default LoginBtn;

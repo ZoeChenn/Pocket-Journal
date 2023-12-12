@@ -308,7 +308,7 @@ export default function MyJournalPage() {
         <section className="projectNoteSection flex-grow px-8 py-8 overflow-y-auto scrollbar max-md:px-4">
           { projects.length === 0 ? (
             <div className="flex items-center justify-center h-full">
-              <div className="text-center">
+              <div className="text-center cursor-default">
                 <p className="text-2xl font-extralight">Welcome!</p>
                 <p className="text-2xl font-extralight">Click + to create a new project.</p>
               </div>
