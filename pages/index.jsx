@@ -1,6 +1,7 @@
 import React from "react";
 import Head from 'next/head';
 import Navbar from "../layouts/Navbar";
+import Footer from "../layouts/Footer";
 import LoginSection from "../layouts/LoginSection";
 import { FiChevronsDown, FiChevronsUp } from "react-icons/fi";
 
@@ -89,19 +90,7 @@ export default function HomePage() {
           <br />
           <FiChevronsUp className="mx-auto w-9 h-9 mt-5 animate-bounce" />
         </div>
-      <footer className="mt-20 w-full border-t border-solid border-stone-100">
-        <div className="px-4 lg:px-40 py-4 flex justify-between items-center">
-          <p>© 2023 ZoeChen</p>
-          <div className="flex flex-row">
-            <a href="https://github.com/ZoeChenn">
-              <img className="w-8 cursor-pointer" src="/assets/images/icons/github-icon.svg" alt="GitHub" />
-            </a>
-            <a href="https://linkedin.com/in/zoechennn">
-              <img className="w-8 ml-4 cursor-pointer" src="/assets/images/icons/linkedin-icon.svg" alt="LinkedIn" />
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 }
