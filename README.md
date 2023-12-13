@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Pocket Journal
+Pocket Journal offers project-based note management, supporting Markdown and integrating calendar functionality, allowing users to easily record and plan their daily lives.
+### Demo：https://pocket-journal.app/
 
-## Getting Started
+![pocketJournal](https://github.com/ZoeChenn/Pocket-Journal/assets/96377193/6a31e3c4-2627-4807-8fcd-b322af26f5e7)
+## Architecture
+#### Integrated [novel](https://github.com/steven-tey/novel) WYSIWYG text-editor, selfbuild calendar with [date-fns](https://date-fns.org/) consuming [Google Calendar API](https://developers.google.com/calendar/api/guides/overview) to develop main features.
 
-First, run the development server:
+![Architecture](https://github.com/ZoeChenn/Pocket-Journal/assets/96377193/1b3d4a36-d3f6-4e70-a5a3-60e427252883)
+## React Component Design
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+![Component](https://github.com/ZoeChenn/Pocket-Journal/assets/96377193/43ab7a9b-3050-4e7c-bff0-90f509c211df)
+## Features
+- #### Take Notes in Project Mode
+![howToUse1](https://github.com/ZoeChenn/Pocket-Journal/assets/96377193/1cadd7a8-84fd-4a76-9af0-32897ffc3cc7)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- #### Markdown Support
+![howToUse2](https://github.com/ZoeChenn/Pocket-Journal/assets/96377193/26c59bef-6888-46c8-a0d7-e3285749f091)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- #### Connect date with note
+![howToUse3](https://github.com/ZoeChenn/Pocket-Journal/assets/96377193/9ee71a34-f8eb-4d57-bf59-e0a52756bb16)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
