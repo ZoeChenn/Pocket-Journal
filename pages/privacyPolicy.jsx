@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import Navbar from "../layouts/Navbar";
 import Footer from "../layouts/Footer";
 import { FiChevronsUp } from "react-icons/fi";
