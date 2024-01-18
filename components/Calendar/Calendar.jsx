@@ -9,13 +9,13 @@ const Calendar = ({ onChangeMonth, onDateSelect, selectedDate, setSelectedDate, 
     const dateFormat = "MMMM yyyy";
     return (
       <div className="flex items-center justify-between px-4 py-2">
-        <button onClick={ prevMonth } className="p-2">
+        <button onClick={ prevMonth } className="p-2" data-testid="prev-month-button">
           <FaAngleLeft className="text-gray-500 hover:text-gray-700"/>
         </button>
         <span className="text-lg font-bold text-gray-800 cursor-default">
           { format(currentMonth, dateFormat) }
         </span>
-        <button onClick={ nextMonth } className="p-2">
+        <button onClick={ nextMonth } className="p-2" data-testid="next-month-button">
           <FaAngleRight className="text-gray-500 hover:text-gray-700"/>
         </button>
       </div>
